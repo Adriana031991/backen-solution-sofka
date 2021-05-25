@@ -1,10 +1,7 @@
 package co.com.sofka.questions.route;
 
 import co.com.sofka.questions.model.QuestionDTO;
-import co.com.sofka.questions.usecase.CreateUseCase;
-import co.com.sofka.questions.usecase.DeleteUseCase;
-import co.com.sofka.questions.usecase.GetQuestionUseCase;
-import co.com.sofka.questions.usecase.ListUseCase;
+import co.com.sofka.questions.usecase.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -12,13 +9,12 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
-import java.util.List;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.*;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
 @Configuration
-public class CreateRoute {
+public class QuestionRoute {
     @Bean
     public RouterFunction<ServerResponse> create(CreateUseCase createUseCase) {
         return route(POST("/create").and(accept(MediaType.APPLICATION_JSON)),
@@ -61,5 +57,18 @@ public class CreateRoute {
         ));
 
     }
+
+    @Bean
+    public RouterFunction<ServerResponse> ownerList(OwnerListUseCase ownerListUseCase){
+        return route(GET("/owner/{userId}").and(accept(MediaType.APPLICATION_JSON)),
+                request -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(BodyInserters.fromPublisher(ownerListUseCase.apply(
+                                request.pathVariable("userId")),
+                                QuestionDTO.class)));
+
+    }
+
+
 
 }
